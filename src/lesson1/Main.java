@@ -9,11 +9,17 @@ public class Main {
      */
     public static void main(String[] args) {
         // Задача 1:
-        DayOfWeek dayOfWeek = DayOfWeek.MONDAY;
-        System.out.println(getWorkingHours(dayOfWeek));
+        DayOfWeek dayOfWeek = DayOfWeek.SATURDAY;
+        System.out.println("Задача 1 (перечисления)");
+        System.out.println("Остаток часов: "+getWorkingHours(dayOfWeek));
 
         //Задача 2:
+        System.out.println("Задача 2 (Препядствия)");
         competitions();
+
+        //Задача 3
+        System.out.println("Задача 3 (Команды)");
+        CourseTeam();
     }
     /**
      * задача 1: Требуется реализовать enum DayOfWeek, который будет представлять дни недели.
@@ -67,4 +73,22 @@ public class Main {
             c.info();
         }
      }
- }
+    /** Задача 3
+     * 2. Добавить класс Team, который будет содержать: название команды,
+     * массив из 4-х участников (т.е. в конструкторе можно сразу всех участников указывать),
+     * метод для вывода информации о членах команды прошедших дистанцию,
+     * метод вывода информации обо всех членах команды.
+     * 3. Добавить класс Course (полоса препятствий), в котором будут находиться: массив препятствий,
+     * метод который будет просить команду пройти всю полосу;
+     */
+    public static void CourseTeam(){
+        Teams teams = new Teams("Dream",
+                new Cat("Kokos"), new Human("Max"), new Dog("Boby"));
+        Obstacle[] obstacle = {new Cross(80), new Wall(3), new Water(12)};
+        Course course = new Course(obstacle);
+        course.doIt(teams);
+        teams.showWinners();
+        teams.showContributors();
+    }
+
+}
