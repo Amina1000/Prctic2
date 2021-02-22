@@ -11,7 +11,11 @@ public class Main {
         Body body = new Body();
 
         SmallHead smallHead = new SmallHead();
+<<<<<<< HEAD
         //MediumHead mediumHead = new MediumHead();
+=======
+        MediumHead mediumHead = new MediumHead();
+>>>>>>> origin/Develop
         BigHead bigHead = new BigHead();
 
         Robot<SmallHead> robot = new Robot<>(body,smallHead);
