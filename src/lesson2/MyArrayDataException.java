@@ -1,9 +1,7 @@
 package lesson2;
 
-public class MyArrayDataException extends Exception{
-
+public class MyArrayDataException extends Exception {
     public MyArrayDataException() {
-        super();
     }
 
     public MyArrayDataException(String message) {
@@ -18,7 +16,7 @@ public class MyArrayDataException extends Exception{
         super(cause);
     }
 
-    protected MyArrayDataException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public MyArrayDataException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }
