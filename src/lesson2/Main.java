@@ -15,20 +15,16 @@ public class Main {
         (сумму элементов, при условии что подали на вход корректный массив).
         */
         String[][] myArray= {
-                {"","","",""},
-                {"","","",""},
-                {"","","",""},
-                {"","","",""}
+                {"1","0","12","2"},
+                {"0","1","г","2"},
+                {"9","4","0","2"},
+                {"5","0","8","6"}
         };
 
         try {
             array_elements(myArray);
-        } catch (MyArraySizeException e) {
-            e.printStackTrace();
-        }
-        try {
             sum_array_elements(myArray);
-        } catch (MyArrayDataException e) {
+        } catch (MyArraySizeException | MyArrayDataException e) {
             e.printStackTrace();
         }
     }
@@ -38,7 +34,16 @@ public class Main {
       При подаче массива другого размера необходимо бросить исключение MyArraySizeException.
      */
     public static void array_elements(String[][] myArray) throws MyArraySizeException {
-        throw new MyArraySizeException("Не верный формат");
+        if (myArray.length != 4) {
+            throw new MyArraySizeException("Не верный формат");
+        } else {
+            for (String[] strings : myArray) {
+                if (strings.length !=4){
+                    throw new MyArraySizeException("Не верный формат");
+                }
+            }
+        }
+
     }
 
     /*Задача 2
@@ -53,7 +58,7 @@ public class Main {
             for (String string : strings) {
                 try {
                     int a = Integer.parseInt(string);
-                    sum = +a;
+                    sum += a;
                 } catch (NumberFormatException e) {
                     throw new MyArrayDataException("Не удалось преобразовать, не верный формат ячейки", e);
                 }
