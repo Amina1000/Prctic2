@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
  * @author Admin
  * 17.03.2021
  */
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame{
 
     public MainWindow() {
         setTitle("Chat");
@@ -32,6 +32,7 @@ public class MainWindow extends JFrame {
         add(jp, BorderLayout.SOUTH);
 
         ActionListener send = e -> {
+
             jTextArea.append(textField.getText() + "\n");
             textField.setText("");
         };
@@ -41,5 +42,4 @@ public class MainWindow extends JFrame {
 
         setVisible(true);
     }
-
 }
