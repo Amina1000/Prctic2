@@ -39,6 +39,7 @@ public class Controller {
                     e.printStackTrace();
                 }finally {
                     try {
+                        assert socket != null;
                         socket.close();
                     } catch (IOException e) {
                         e.printStackTrace();
