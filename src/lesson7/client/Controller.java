@@ -1,6 +1,5 @@
 package lesson7.client;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
@@ -93,7 +92,7 @@ public class Controller {
         }
     }
 
-    public void tryToAuth(ActionEvent actionEvent) {
+    public void tryToAuth() {
         if (socket==null || socket.isClosed()){
             connect();
         }

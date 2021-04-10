@@ -33,7 +33,7 @@ public class ClientsSrv {
                                 sendMSG("/autoOk");
                                 nick = newNick;
                                 server.subscribe(this);
-                                System.out.println("Клиент" + nick +" авторизовался");
+                                System.out.println("Клиент " + nick +" авторизовался");
                                 break;
                             }else {
                                 sendMSG("Неверный логин");
@@ -46,7 +46,15 @@ public class ClientsSrv {
                         if (str.equals("/end")) {
                             break;
                         }
-                          server.getMSG(nick + ": " +str);
+                         /*
+                         2. * Реализовать личные сообщения, если клиент пишет «/w nick3 Привет»,
+                         то только клиенту с ником nick3 должно прийти сообщение «Привет»
+                         */
+                        if (str.startsWith("/w")) {
+                            String[] token = str.split(" ");
+                            server.getMSG(nick + ": " + token[2], token[1]);
+                        } else
+                            server.getMSG(nick + ": " + str);
                     }
                 }catch (IOException e) {
                     e.printStackTrace();
@@ -57,7 +65,7 @@ public class ClientsSrv {
                         e.printStackTrace();
                     }
                     server.unsubscribe(this);
-                    System.out.println("Клиент" + nick +" отключился");
+                    System.out.println("Клиент " + nick +" отключился");
                 }
             }).start();
         } catch (IOException e) {

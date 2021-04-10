@@ -46,12 +46,21 @@ public class Server {
             c.sendMSG(msg);
         }
     }
-
+   /*
+   2. * Реализовать личные сообщения, если клиент пишет «/w nick3 Привет»,
+   то только клиенту с ником nick3 должно прийти сообщение «Привет»
+   */
+    public void getMSG(String msg, String nick) {
+        for (ClientsSrv c : client) {
+           if(c.nick.equalsIgnoreCase(nick)) c.sendMSG(msg);
+        }
+    }
     public void subscribe(ClientsSrv clientsSrv) {
         client.add(clientsSrv);
     }
 
     public void unsubscribe(ClientsSrv clientsSrv) {
         client.remove(clientsSrv);
+        Authorization.disconnect();
     }
 }
