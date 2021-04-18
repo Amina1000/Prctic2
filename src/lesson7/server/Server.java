@@ -17,6 +17,7 @@ public class Server {
 
     public Server() throws SQLException {
         Authorization.connect();
+
         client = new Vector<>();
         ServerSocket serverSocket = null;
         Socket socket;
@@ -41,26 +42,42 @@ public class Server {
         }
     }
 
-    public void getMSG(String msg) {
+    public void getMSG(String msg,String sender) {
+        Authorization.addMessageDb(sender,"null",msg);
         for (ClientsSrv c : client) {
-            c.sendMSG(msg);
+            c.sendMSG(sender+": "+ msg);
         }
     }
    /*
    2. * Реализовать личные сообщения, если клиент пишет «/w nick3 Привет»,
    то только клиенту с ником nick3 должно прийти сообщение «Привет»
    */
-    public void getMSG(String msg, String nick) {
+    public void getMSG(String msg, String receiver, String sender) {
+        Authorization.addMessageDb(sender,receiver,msg);
         for (ClientsSrv c : client) {
-           if(c.nick.equalsIgnoreCase(nick)) c.sendMSG(msg);
+           if(c.getNick().equalsIgnoreCase(receiver)||c.getNick().equalsIgnoreCase(sender))
+               c.sendMSG("[Private from "+sender+": "+ msg);
         }
     }
     public void subscribe(ClientsSrv clientsSrv) {
         client.add(clientsSrv);
+        broadCastClientList();
+        clientsSrv.sendMSG(Authorization.getMessageDb(clientsSrv.getNick()));
     }
 
     public void unsubscribe(ClientsSrv clientsSrv) {
         client.remove(clientsSrv);
+        broadCastClientList();
         Authorization.disconnect();
+    }
+    public void broadCastClientList(){
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("/clientList ");
+
+        for (ClientsSrv c:client) sb.append(c.getNick()).append(" ");
+        String cList = sb.toString();
+
+        for (ClientsSrv c:client) c.sendMSG(cList);
     }
 }

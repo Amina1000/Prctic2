@@ -4,6 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.util.Date;
+
 
 /**
  * homework lesson7.client
@@ -14,28 +17,39 @@ import java.net.Socket;
 public class ClientsSrv {
     DataInputStream in;
     DataOutputStream out;
-    String nick;
+    private String nick;
+
+    public String getNick() {
+        return nick;
+    }
 
     public ClientsSrv(Server server, Socket socket) {
         try {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
-            new Thread(()->{
+            new Thread(() -> {
                 try {
                     // авторизация
+                    /*
+                    Добавить отключение неавторизованных пользователей по таймауту
+                    (120 сек. ждём после подключения клиента, и если он не авторизовался за это время, закрываем соединение).
+                     */
+                    socket.setSoTimeout(3000);
                     while (true) {
                         String str = in.readUTF();
                         if (str.startsWith("/auth")) {
                             String[] token = str.split(" ");
-                            String newNick = Authorization.getNickName(token[1],token[2]);
-                            if (newNick!=null){
-                                sendMSG("/autoOk");
+                            String newNick = Authorization.getNickName(token[1], token[2]);
+                            if (newNick != null) {
+                                // обнуляем время ожидания авторизации.
+                                socket.setSoTimeout(0);
+                                sendMSG("/autoOk " + newNick);
                                 nick = newNick;
                                 server.subscribe(this);
-                                System.out.println("Клиент " + nick +" авторизовался");
+                                System.out.println("Клиент " + nick + " авторизовался");
                                 break;
-                            }else {
+                            } else {
                                 sendMSG("Неверный логин");
                             }
                         }
@@ -44,6 +58,7 @@ public class ClientsSrv {
                     while (true) {
                         String str = in.readUTF();
                         if (str.equals("/end")) {
+                            sendMSG("/end");
                             break;
                         }
                          /*
@@ -52,27 +67,36 @@ public class ClientsSrv {
                          */
                         if (str.startsWith("/w")) {
                             String[] token = str.split(" ");
-                            server.getMSG(nick + ": " + token[2], token[1]);
+                            server.getMSG(str, token[1], nick);
                         } else
-                            server.getMSG(nick + ": " + str);
+                            server.getMSG(str, nick);
                     }
-                }catch (IOException e) {
+                } catch (SocketTimeoutException e){
+                    /*
+                    Добавить отключение неавторизованных пользователей по таймауту
+                    (120 сек. ждём после подключения клиента, и если он не авторизовался за это время, закрываем соединение).
+                     */
+                    System.out.println("клиент  превысил время ожидания " + socket.getRemoteSocketAddress());
+                    sendMSG("/end");
+                } catch (IOException e) {
                     e.printStackTrace();
-            }finally {
+                } finally {
                     try {
-                       socket.close();
+                        socket.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     server.unsubscribe(this);
-                    System.out.println("Клиент " + nick +" отключился");
+                    System.out.println();
+                    System.out.println("Клиент " + nick + " отключился " + new Date(System.currentTimeMillis()));
                 }
             }).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    public void sendMSG(String msg){
+
+    public void sendMSG(String msg) {
         try {
             out.writeUTF(msg);
         } catch (IOException e) {

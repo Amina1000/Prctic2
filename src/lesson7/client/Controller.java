@@ -1,16 +1,18 @@
 package lesson7.client;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-
 
 public class Controller {
     @FXML
@@ -25,23 +27,35 @@ public class Controller {
     public HBox upperPanel;
     @FXML
     public HBox bottomPanel;
+    @FXML
+    public ListView<String> clientList;
 
     Socket socket;
     DataInputStream in;
     DataOutputStream out;
     final String ip = "localHost";
     final int port = 8189;
+    String nick;
+    Stage stage;
 
     public void setSingIn(boolean singIn) {
-        if (singIn){
+        if (singIn) {
             upperPanel.setVisible(false);
+            upperPanel.setManaged(false);
             bottomPanel.setVisible(true);
-        }else{
+            bottomPanel.setManaged(true);
+            clientList.setVisible(true);
+            clientList.setManaged(true);
+
+        } else {
             upperPanel.setVisible(true);
+            upperPanel.setManaged(true);
             bottomPanel.setVisible(false);
+            bottomPanel.setManaged(false);
+            clientList.setVisible(false);
+            clientList.setManaged(false);
         }
     }
-
 
     protected void connect() {
         try {
@@ -53,15 +67,32 @@ public class Controller {
                 try {
                     while (true) {
                         String str = in.readUTF();
-                        if (str.equals("/autoOk")){
+                        if (str.startsWith("/autoOk")) {
                             setSingIn(true);
+                            nick = str.split(" ")[1];
                             break;
                         }
                         textAria.appendText(str + "\n");
                     }
+                    SetTitle();
                     while (true) {
                         String str = in.readUTF();
-                        textAria.appendText(str + "\n");
+                        if (str.startsWith("/")) {
+                            if (str.equals("/end")) {
+                                break;
+                            }
+                            if (str.startsWith("/clientList")){
+                                String[] cList = str.split(" ");
+                                Platform.runLater(()->{
+                                    clientList.getItems().clear();
+                                    for (int i = 1; i < cList.length; i++) {
+                                        clientList.getItems().add(cList[i]);
+                                    }
+                                });
+                            }
+                        }else {
+                            textAria.appendText(str + "\n");
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -93,17 +124,35 @@ public class Controller {
     }
 
     public void tryToAuth() {
-        if (socket==null || socket.isClosed()){
+        if (socket == null || socket.isClosed()) {
             connect();
         }
         try {
-            out.writeUTF("/auth "+ loginField.getText() + " "+ passwordField.getText());
+            out.writeUTF("/auth " + loginField.getText() + " " + passwordField.getText());
             loginField.clear();
             passwordField.clear();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public void SetTitle() {
+        Platform.runLater(() -> {
+            stage = (Stage) textAria.getScene().getWindow();
+            stage.setTitle("Chat " + nick);
+            stage.setOnCloseRequest(e -> {
+                System.out.println("buy");
+                try {
+                    out.writeUTF("/end");
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+            });
+        });
+    }
 
+    public void clickClientList() {
+        String receiver =clientList.getSelectionModel().getSelectedItem();
+        textField.setText("/w "+receiver + " ");
     }
 }
