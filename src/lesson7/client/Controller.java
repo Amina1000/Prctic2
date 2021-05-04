@@ -6,6 +6,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
@@ -37,6 +38,7 @@ public class Controller {
     final int port = 8189;
     String nick;
     Stage stage;
+    String newNick;
 
     public void setSingIn(boolean singIn) {
         if (singIn) {
@@ -65,6 +67,9 @@ public class Controller {
 
             new Thread(() -> {
                 try {
+                    /*
+                    1. Добавить в сетевой чат авторизацию через базу данных SQLite.
+                     */
                     while (true) {
                         String str = in.readUTF();
                         if (str.startsWith("/autoOk")) {
@@ -81,16 +86,30 @@ public class Controller {
                             if (str.equals("/end")) {
                                 break;
                             }
-                            if (str.startsWith("/clientList")){
+                            /*
+                            2.*Добавить в сетевой чат возможность смены ника.
+                             */
+                            if (str.startsWith("/clientList")) {
                                 String[] cList = str.split(" ");
-                                Platform.runLater(()->{
+                                Platform.runLater(() -> {
                                     clientList.getItems().clear();
                                     for (int i = 1; i < cList.length; i++) {
                                         clientList.getItems().add(cList[i]);
                                     }
+                                    clientList.setCellFactory(TextFieldListCell.forListView());
+                                    clientList.setOnEditCommit(event -> {
+                                        String oldNick = clientList.getSelectionModel().getSelectedItem();
+                                        clientList.getItems().set(event.getIndex(), event.getNewValue());
+                                        newNick = clientList.getSelectionModel().getSelectedItem();
+                                        try {
+                                            out.writeUTF("/chNick " + newNick + " " + oldNick);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    });
                                 });
                             }
-                        }else {
+                        } else {
                             textAria.appendText(str + "\n");
                         }
                     }
@@ -152,7 +171,7 @@ public class Controller {
     }
 
     public void clickClientList() {
-        String receiver =clientList.getSelectionModel().getSelectedItem();
-        textField.setText("/w "+receiver + " ");
+        String receiver = clientList.getSelectionModel().getSelectedItem();
+        textField.setText("/w " + receiver + " ");
     }
 }

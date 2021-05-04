@@ -23,6 +23,11 @@ public class ClientsSrv {
         return nick;
     }
 
+    @Override
+    public String toString() {
+        return nick;
+    }
+
     public ClientsSrv(Server server, Socket socket) {
         try {
             in = new DataInputStream(socket.getInputStream());
@@ -68,7 +73,16 @@ public class ClientsSrv {
                         if (str.startsWith("/w")) {
                             String[] token = str.split(" ");
                             server.getMSG(str, token[1], nick);
-                        } else
+                        }
+                        /*
+                        2.*Добавить в сетевой чат возможность смены ника.
+                         */
+                        if (str.startsWith("/chNick ")){
+                            String[] token = str.split(" ");
+                            server.getMSG("nickname " + token[2]+" has been changed to "+ token[1], nick);
+                            server.changeNickMethod(token[2],token[1],this);
+                        }
+                        else
                             server.getMSG(str, nick);
                     }
                 } catch (SocketTimeoutException e){
@@ -104,4 +118,7 @@ public class ClientsSrv {
         }
     }
 
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
 }

@@ -72,10 +72,16 @@ public class Authorization {
                         "VALUES ('%s', '%s'  ,'%s' );",sender,receiver,text);
         executeDataUpdate(sql);
     }
+    public static void changeNickData(String oldNick, String newNick){
+
+        String sql = String.format(
+                "UPDATE main set nickname ='%s' \n"+
+                        "WHERE nickname ='%s';",newNick, oldNick);
+        executeDataUpdate(sql);
+    }
 
     private static ResultSet executeDataQuery(String sql) throws SQLException {
-        ResultSet rs = statement.executeQuery(sql);
-        return rs;
+        return statement.executeQuery(sql);
     }
 
     private static void executeDataUpdate(String sql) {

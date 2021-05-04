@@ -59,6 +59,18 @@ public class Server {
                c.sendMSG("[Private from "+sender+": "+ msg);
         }
     }
+    /*
+    2.*Добавить в сетевой чат возможность смены ника.
+     */
+    public void changeNickMethod(String oldNick, String newNick,ClientsSrv clientsSrv) {
+        Authorization.changeNickData(oldNick, newNick);
+        for (ClientsSrv c:client) if(c.equals(clientsSrv)) c.setNick(newNick);
+        broadCastClientList();
+    }
+
+    /*
+    1. Добавить в сетевой чат авторизацию через базу данных SQLite.
+    */
     public void subscribe(ClientsSrv clientsSrv) {
         client.add(clientsSrv);
         broadCastClientList();
