@@ -35,7 +35,7 @@ public class Controller {
     DataInputStream in;
     DataOutputStream out;
     final String ip = "localHost";
-    final int port = 8189;
+    final int port = 8188;
     String nick;
     Stage stage;
     String newNick;

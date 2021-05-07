@@ -14,7 +14,6 @@ import java.util.Vector;
  */
 public class Server {
     private final Vector<ClientsSrv> client;
-
     public Server() throws SQLException {
         Authorization.connect();
 
@@ -23,7 +22,7 @@ public class Server {
         Socket socket;
 
         try {
-            serverSocket = new ServerSocket(8189);
+            serverSocket = new ServerSocket(8188);
             System.out.println("Сервер запущен");
             while (true) {
                 socket = serverSocket.accept();
@@ -43,7 +42,8 @@ public class Server {
     }
 
     public void getMSG(String msg,String sender) {
-        Authorization.addMessageDb(sender,"null",msg);
+        //Authorization.addMessageDb(sender,"null",msg);
+        ChatStream.setTextHistory(sender,msg);
         for (ClientsSrv c : client) {
             c.sendMSG(sender+": "+ msg);
         }
@@ -53,7 +53,8 @@ public class Server {
    то только клиенту с ником nick3 должно прийти сообщение «Привет»
    */
     public void getMSG(String msg, String receiver, String sender) {
-        Authorization.addMessageDb(sender,receiver,msg);
+       // Authorization.addMessageDb(sender,receiver,msg);
+        ChatStream.setTextHistory(sender,msg);
         for (ClientsSrv c : client) {
            if(c.getNick().equalsIgnoreCase(receiver)||c.getNick().equalsIgnoreCase(sender))
                c.sendMSG("[Private from "+sender+": "+ msg);
@@ -74,7 +75,8 @@ public class Server {
     public void subscribe(ClientsSrv clientsSrv) {
         client.add(clientsSrv);
         broadCastClientList();
-        clientsSrv.sendMSG(Authorization.getMessageDb(clientsSrv.getNick()));
+       //clientsSrv.sendMSG(Authorization.getMessageDb(clientsSrv.getNick()));
+        clientsSrv.sendMSG(ChatStream.getTextHistory(clientsSrv.getNick()));
     }
 
     public void unsubscribe(ClientsSrv clientsSrv) {
