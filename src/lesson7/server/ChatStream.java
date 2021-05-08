@@ -18,12 +18,11 @@ public class ChatStream {
     private static final String fileName = "C:\\JavaPractic\\Prctic2\\src\\lesson7\\chatHistory\\";
     private static BufferedWriter writer;
     private static FileWriter fileWriter;
-
     public static void setTextHistory(String nick, String textHistory) {
         try {
             fileWriter = new FileWriter(fileName + "history_" + nick + ".txt", true);
             writer = new BufferedWriter(fileWriter);
-            writer.write(textHistory +"\n");
+            writer.write(nick+": "+textHistory +"\n");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -43,10 +42,9 @@ public class ChatStream {
     public static String getTextHistory(String nick) {
         StringBuilder textHistory = new StringBuilder();
         String str;
-        BufferedReader reader;
         int countString = 0;
         try {
-            reader = new BufferedReader(new FileReader(fileName + "history_" + nick + ".txt"));
+            BufferedReader reader = new BufferedReader(new FileReader(fileName + "history_" + nick + ".txt"));
             while ((str = reader.readLine()) != null && countString < 101) {
                 textHistory.append(str).append("\n");
                 countString++;
@@ -55,5 +53,19 @@ public class ChatStream {
             e.printStackTrace();
         }
         return textHistory.toString();
+    }
+    public static String censorship(String msg){
+        String word;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("C:\\JavaPractic\\Prctic2\\src\\lesson7\\censorship\\censorship.txt"));
+            while ((word = reader.readLine()) != null) {
+                if(msg.toLowerCase().contains(word.toLowerCase())){
+                    return word;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

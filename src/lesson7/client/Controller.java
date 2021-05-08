@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import lesson7.server.ChatStream;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -134,9 +135,18 @@ public class Controller {
 
     public void sendMSG() {
         try {
-            out.writeUTF(textField.getText());
-            textField.setText("");
-            textField.requestFocus();
+            String msg = textField.getText();
+            //3. Добавить "цензуру". Java3
+            String censorship = ChatStream.censorship(msg);
+            if (censorship != null) {
+                textField.setStyle("-fx-text-inner-color: red;");
+                textField.setText(msg +"(слово '" + censorship + "' нельзя употреблять согласно цензуре чата!)");
+            } else {
+                out.writeUTF(msg);
+                textField.setStyle(null);
+                textField.setText("");
+                textField.requestFocus();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
