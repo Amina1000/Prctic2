@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="center" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lesson7.client.Controller">
+
+    <HBox fx:id="upperPanel" managed="true">
+        <TextField fx:id="loginField" promptText="login" HBox.hgrow="ALWAYS" />
+        <PasswordField fx:id="passwordField" onAction="#tryToAuth" promptText="password" HBox.hgrow="ALWAYS" />
+        <Button onAction="#tryToAuth" text="Sing" />
+    </HBox>
+    <HBox VBox.vgrow="ALWAYS">
+        <TextArea fx:id="textAria" HBox.hgrow="ALWAYS" />
+        <ListView fx:id="clientList" editable="true" managed="false" minWidth="50.0" onContextMenuRequested="#clickClientList" visible="false" />
+    </HBox>
+
+    <HBox fx:id="bottomPanel" managed="false" visible="false">
+        <TextField fx:id="textField" onAction="#sendMSG" HBox.hgrow="ALWAYS" />
+        <Button onAction="#sendMSG" text="send">
+            <font>
+                <Font name="System Bold Italic" size="12.0" />
+            </font>
+            <effect>
+                <DropShadow>
+                    <color>
+                        <Color green="0.7666666507720947" blue="1.0" />
+                    </color>
+                </DropShadow>
+            </effect>
+        </Button>
+    </HBox>
+
+</VBox>

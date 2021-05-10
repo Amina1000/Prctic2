@@ -1,7 +1,5 @@
 package lesson6.server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,27 +12,24 @@ import java.util.Vector;
  * 25.03.2021
  */
 public class Server {
-    private Vector<Clients>clients;
+    private final Vector<ClientsSrv> client;
 
-    public Server(){
-        clients = new Vector<>();
+    public Server() {
+        client = new Vector<>();
         ServerSocket serverSocket = null;
         Socket socket = null;
-        DataInputStream in;
-        DataOutputStream out;
 
         try {
             serverSocket = new ServerSocket(8189);
             System.out.println("Сервер запущен");
-
-            while (true){
-                socket = serverSocket.accept();
-                System.out.println("Клиент подключился");
-                clients.add(new Clients(this, socket));
+            while (true) {
+                    socket = serverSocket.accept();
+                    System.out.println("Клиент подключился");
+                    client.add(new ClientsSrv(this, socket));
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
+        }finally {
             try {
                 assert socket != null;
                 socket.close();
@@ -47,10 +42,10 @@ public class Server {
                 e.printStackTrace();
             }
         }
-
     }
-    public void getMSG(String msg){
-        for (Clients c:clients) {
+
+    public void getMSG(String msg) {
+        for (ClientsSrv c : client) {
             c.sendMSG(msg);
         }
     }
