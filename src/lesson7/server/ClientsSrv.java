@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
@@ -29,11 +31,14 @@ public class ClientsSrv {
     }
 
     public ClientsSrv(Server server, Socket socket) {
+        /*
+        2. На серверной стороне сетевого чата реализовать управление потоками через ExecutorService.
+         */
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
         try {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-
-            new Thread(() -> {
+            executorService.execute(() -> {
                 try {
                     // авторизация
                     /*
@@ -77,15 +82,14 @@ public class ClientsSrv {
                         /*
                         2.*Добавить в сетевой чат возможность смены ника.
                          */
-                        if (str.startsWith("/chNick ")){
+                        if (str.startsWith("/chNick ")) {
                             String[] token = str.split(" ");
-                            server.getMSG("nickname " + token[2]+" has been changed to "+ token[1], nick);
-                            server.changeNickMethod(token[2],token[1],this);
-                        }
-                        else
+                            server.getMSG("nickname " + token[2] + " has been changed to " + token[1], nick);
+                            server.changeNickMethod(token[2], token[1], this);
+                        } else
                             server.getMSG(str, nick);
                     }
-                } catch (SocketTimeoutException e){
+                } catch (SocketTimeoutException e) {
                     /*
                     Добавить отключение неавторизованных пользователей по таймауту
                     (120 сек. ждём после подключения клиента, и если он не авторизовался за это время, закрываем соединение).
@@ -104,9 +108,12 @@ public class ClientsSrv {
                     System.out.println();
                     System.out.println("Клиент " + nick + " отключился " + new Date(System.currentTimeMillis()));
                 }
-            }).start();
+            });
+
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            executorService.shutdown();
         }
     }
 
